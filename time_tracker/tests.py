@@ -1,7 +1,9 @@
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
+
 from .models import Project, TimeLog
+
 
 class TestCreateUserAPIView(APITestCase):
     def test_with_post_method_with_correct_arguments(self):
@@ -70,7 +72,6 @@ class TestProjectAPIView(APITestCase):
         response = self.client.get("/project/")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-
     def test_with_post_method(self):
         self.client.force_authenticate(self.user)
         payload = {
@@ -106,7 +107,7 @@ class TestProjectAPIView(APITestCase):
             project=self.project,
             work_description="Test Desc",
             date="2022-08-02",
-            hours=2.30
+            hours=2.30,
         )
 
     # test endpoint without url argument
@@ -115,15 +116,14 @@ class TestProjectAPIView(APITestCase):
         response = self.client.get("/timelog/")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-
     def test_with_post_method(self):
         self.client.force_authenticate(self.user)
         payload = {
-            "project":self.project.id,
-            "work_description":"Test Desc",
-            "date":"2022-08-03",
-            "hours":2.30,
-            "status":"in_progress"
+            "project": self.project.id,
+            "work_description": "Test Desc",
+            "date": "2022-08-03",
+            "hours": 2.30,
+            "status": "in_progress",
         }
         response = self.client.post("/timelog/", data=payload)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -138,4 +138,3 @@ class TestProjectAPIView(APITestCase):
         self.client.force_authenticate(self.user)
         response = self.client.get(f"/project/{self.timelog.id}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
- 

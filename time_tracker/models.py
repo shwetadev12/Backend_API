@@ -1,10 +1,11 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 # Create your models here.
 
+
 class Project(models.Model):
-    user = models.ManyToManyField(User, through=u'Timelog')
+    user = models.ManyToManyField(User, through="Timelog")
     title = models.CharField(max_length=56)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

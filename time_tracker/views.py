@@ -1,16 +1,19 @@
+from django.contrib.auth.models import User
 from rest_framework.exceptions import ValidationError
+from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth.models import User
-from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
-from .serializers import UserSerializer, ProjectSerializer, TimelogSerializer
+
 from .models import Project, TimeLog
+from .serializers import ProjectSerializer, TimelogSerializer, UserSerializer
 
 # Create your views here.
 
+
 class CreateUserAPIView(CreateAPIView):
     """View for create the user"""
+
     serializer_class = UserSerializer
     permission_classes = (AllowAny,)
 
@@ -40,7 +43,7 @@ class UserRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 class ProjectAPIView(APIView):
     """Apiview for the CRUD operation of the project"""
 
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get_object(self, pk):
         try:
@@ -49,7 +52,7 @@ class ProjectAPIView(APIView):
             raise ValidationError("No project found with the given id")
 
     def get(self, *args, **kwargs):
-        pk = kwargs.get('pk')
+        pk = kwargs.get("pk")
         if pk:
             data = self.get_object(pk)
             serializer = ProjectSerializer(data)
@@ -71,7 +74,7 @@ class ProjectAPIView(APIView):
         return response
 
     def put(self, request, *args, **kwargs):
-        pk = kwargs.get('pk')
+        pk = kwargs.get("pk")
         project_to_update = self.get_object(pk)
         serializer = ProjectSerializer(
             instance=project_to_update, data=request.data, partial=True
@@ -86,7 +89,7 @@ class ProjectAPIView(APIView):
         return response
 
     def delete(self, *args, **kwargs):
-        pk = kwargs.get('pk')
+        pk = kwargs.get("pk")
         project_to_delete = self.get_object(pk)
         project_to_delete.delete()
         return Response({"message": "Project Deleted Successfully"})
@@ -95,7 +98,7 @@ class ProjectAPIView(APIView):
 class TimelogAPIView(APIView):
     """Apiview for the CRUD operation of the Timelog"""
 
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get_object(self, pk):
         try:
@@ -104,7 +107,7 @@ class TimelogAPIView(APIView):
             raise ValidationError("No Timelog available for given ID")
 
     def get(self, *args, **kwargs):
-        pk = kwargs.get('pk')
+        pk = kwargs.get("pk")
         if pk:
             data = self.get_object(pk)
             serializer = TimelogSerializer(data)
@@ -114,7 +117,9 @@ class TimelogAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = TimelogSerializer(data=request.data, context={'user':request.user})
+        serializer = TimelogSerializer(
+            data=request.data, context={"user": request.user}
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         response = Response()
@@ -139,7 +144,7 @@ class TimelogAPIView(APIView):
         return response
 
     def delete(self, *args, **kwargs):
-        pk = kwargs.get('pk')
+        pk = kwargs.get("pk")
         timelog_to_delete = self.get_object(pk)
         timelog_to_delete.delete()
         return Response({"message": "Timelog Deleted Successfully"})

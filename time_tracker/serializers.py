@@ -1,6 +1,8 @@
 from dataclasses import field
-from rest_framework import serializers
+
 from django.contrib.auth.models import User
+from rest_framework import serializers
+
 from .models import Project, TimeLog
 
 
@@ -24,13 +26,13 @@ class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         # fields = "__all__"
-        fields = ['title', 'user', 'description']
+        fields = ["title", "user", "description"]
 
 
 class TimelogSerializer(serializers.ModelSerializer):
     class Meta:
         model = TimeLog
-        fields = ["project", "work_description", "status", "hours", 'date']
+        fields = ["project", "work_description", "status", "hours", "date"]
 
     def create(self, validated_data):
         validated_data["user"] = self.context.get("user")
