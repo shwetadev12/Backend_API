@@ -40,7 +40,7 @@ class UserRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 class ProjectAPIView(APIView):
     """Apiview for the CRUD operation of the project"""
 
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get_object(self, pk):
         try:
@@ -50,8 +50,13 @@ class ProjectAPIView(APIView):
 
     def get(self, *args, **kwargs):
         pk = kwargs.get('pk')
-        data = self.get_object(pk) if pk else Project.objects.all()
-        serializer = ProjectSerializer(data)
+        if pk:
+            data = self.get_object(pk)
+            serializer = ProjectSerializer(data)
+        else:
+            data = Project.objects.all()
+            serializer = ProjectSerializer(data, many=True)
+
         return Response(serializer.data)
 
     def post(self, request):
@@ -90,18 +95,22 @@ class ProjectAPIView(APIView):
 class TimelogAPIView(APIView):
     """Apiview for the CRUD operation of the Timelog"""
 
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get_object(self, pk):
         try:
-            return TimeLog.objects.get(pk=pk)
+            return TimeLog.objects.filter(pk=pk).first()
         except TimeLog.DoesNotExist:
             raise ValidationError("No Timelog available for given ID")
 
     def get(self, *args, **kwargs):
         pk = kwargs.get('pk')
-        data = self.get_object(pk) if pk else TimeLog.objects.all()
-        serializer = TimelogSerializer(data, many=True)
+        if pk:
+            data = self.get_object(pk)
+            serializer = TimelogSerializer(data)
+        else:
+            data = TimeLog.objects.all()
+            serializer = TimelogSerializer(data, many=True)
         return Response(serializer.data)
 
     def post(self, request):
