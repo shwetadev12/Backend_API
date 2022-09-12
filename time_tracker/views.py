@@ -4,7 +4,7 @@ from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework import status
 from .models import Project, TimeLog
 from .serializers import ProjectSerializer, TimelogSerializer, UserSerializer
 
@@ -23,6 +23,7 @@ class CreateUserAPIView(CreateAPIView):
         serializer.save()
         response = Response()
         response.data = {
+            "status": status.HTTP_201_CREATED,
             "message": "User Created Successfully",
             "data": serializer.data,
         }
@@ -47,7 +48,7 @@ class ProjectAPIView(APIView):
 
     def get_object(self, pk):
         try:
-            return Project.objects.filter(pk=pk).first()
+            return Project.objects.get(pk=pk)
         except Project.DoesNotExist:
             raise ValidationError("No project found with the given id")
 
@@ -68,6 +69,7 @@ class ProjectAPIView(APIView):
         serializer.save()
         response = Response()
         response.data = {
+            "status": status.HTTP_201_CREATED,
             "message": "Project Created Successfully",
             "data": serializer.data,
         }
@@ -83,6 +85,7 @@ class ProjectAPIView(APIView):
         serializer.save()
         response = Response()
         response.data = {
+            "status": status.HTTP_200_OK,
             "message": "Project Updated Successfully",
             "data": serializer.data,
         }
@@ -91,9 +94,13 @@ class ProjectAPIView(APIView):
     def delete(self, *args, **kwargs):
         pk = kwargs.get("pk")
         project_to_delete = self.get_object(pk)
-        project_to_delete.delete()
-        return Response({"message": "Project Deleted Successfully"})
-
+        resp = project_to_delete.delete()
+        response = Response()
+        response.data = {
+            "status": status.HTTP_204_NO_CONTENT,
+            "message": "Project Deleted Successfully"
+            }
+        return response
 
 class TimelogAPIView(APIView):
     """Apiview for the CRUD operation of the Timelog"""
@@ -102,7 +109,7 @@ class TimelogAPIView(APIView):
 
     def get_object(self, pk):
         try:
-            return TimeLog.objects.filter(pk=pk).first()
+            return TimeLog.objects.get(pk=pk)
         except TimeLog.DoesNotExist:
             raise ValidationError("No Timelog available for given ID")
 
@@ -124,6 +131,7 @@ class TimelogAPIView(APIView):
         serializer.save()
         response = Response()
         response.data = {
+            "status": status.HTTP_201_CREATED,
             "message": "Timelog Created Successfully",
             "data": serializer.data,
         }
@@ -138,6 +146,7 @@ class TimelogAPIView(APIView):
         serializer.save()
         response = Response()
         response.data = {
+            "status": status.HTTP_200_OK,
             "message": "Timelog Updated Successfully",
             "data": serializer.data,
         }
@@ -147,4 +156,7 @@ class TimelogAPIView(APIView):
         pk = kwargs.get("pk")
         timelog_to_delete = self.get_object(pk)
         timelog_to_delete.delete()
-        return Response({"message": "Timelog Deleted Successfully"})
+        return Response({
+            "status":status.HTTP_204_NO_CONTENT,
+            "message": "Timelog Deleted Successfully"
+            })
